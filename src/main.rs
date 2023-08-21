@@ -1,4 +1,5 @@
 use clap::Parser;
+use anyhow::{Result, Context};
 use std::process::Command;
 
 #[derive(Parser)]
@@ -7,14 +8,22 @@ struct Args {
     base_branch: String,
 }
 
-fn main() {
+fn main() -> Result<()> {
     println!("Hello, world!");
 
-    let output = Command::new("git")
-        .arg("-v")
-        .output()
-        .unwrap();
+    let output = Command::new("git").arg("-v").output().with_context(|| "Command not found: git");
 
-    let stdout_str = String::from_utf8(output.stdout).unwrap();
-    println!("{}", stdout_str);
+    match output {
+        Ok(output) => {
+            println!("status: {}", output.status);
+            let stdout = String::from_utf8(output.stdout)?;
+            println!("stdout: {}", stdout);
+        }
+        Err(err) => {
+            eprintln!("{}", err);
+            std::process::exit(1);
+        }
+    }
+
+    Ok(())
 }
