@@ -1,5 +1,5 @@
 use clap::Parser;
-use anyhow::{Result, Context};
+use anyhow::Result;
 use std::process::Command;
 
 #[derive(Parser)]
@@ -9,18 +9,27 @@ struct Args {
 }
 
 fn main() -> Result<()> {
-    println!("Hello, world!");
+    let output = Command::new("git").arg("version").output();
 
-    let output = Command::new("git").arg("-v").output().with_context(|| "Command not found: git");
+    if output.is_err() {
+        eprintln!("Command not found: git");
+        std::process::exit(1);
+    }
+
+    let output = Command::new("git")
+        .args(["for-each-ref", "refs/heads/", "--format", "%(refname:short)"])
+        .output();
 
     match output {
         Ok(output) => {
             println!("status: {}", output.status);
             let stdout = String::from_utf8(output.stdout)?;
             println!("stdout: {}", stdout);
+            let stderr = String::from_utf8(output.stderr)?;
+            println!("stderr: {}", stderr);
         }
         Err(err) => {
-            eprintln!("{}", err);
+            eprintln!("git command failed: {}", err);
             std::process::exit(1);
         }
     }
