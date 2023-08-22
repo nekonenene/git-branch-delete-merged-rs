@@ -3,7 +3,7 @@ use anyhow::Result;
 use clap::Parser;
 use std::process::Command;
 
-use git_branch_delete_merged::{exec_command, is_squashed_branch};
+use git_branch_delete_merged::{exec_command, pick_squashed_branches};
 
 #[derive(Parser)]
 struct Args {
@@ -13,51 +13,40 @@ struct Args {
 
 fn main() -> Result<()> {
     let args = Args::parse();
-    let base_branch_name = args.base_branch;
+    let base_branch_name = &args.base_branch;
 
     let mut deletable_branch_names = Vec::new();
 
-    let output = Command::new("git").arg("version").output();
-    if output.is_err() {
+    let result = Command::new("git").arg("version").output();
+    if result.is_err() {
         eprintln!("{}", Red.paint("Command not found: git"));
         std::process::exit(1);
     }
 
-    let output = exec_command("git", &["for-each-ref", "refs/heads/", "--format", "%(refname:short)"]);
-    if output.is_err() {
-        eprintln!("{}", Red.paint(&output.unwrap_err().to_string()));
+    let result = exec_command("git", &["for-each-ref", "refs/heads/", "--format", "%(refname:short)"]);
+    if result.is_err() {
+        eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
         std::process::exit(1);
     }
 
-    let local_branch_names_with_newline = output.unwrap();
+    let local_branch_names_with_newline = result.unwrap();
     let local_branch_names: Vec<&str> = local_branch_names_with_newline.split('\n').collect();
 
-    println!("{:?}", local_branch_names);
+    println!("Local branches: {:?}", local_branch_names);
 
-    // Add squashed branche names into deletable_branch_names
-    for local_branch_name in local_branch_names.iter() {
-        println!("Branch name: {}", local_branch_name);
-
-        if local_branch_name.eq(&base_branch_name) {
-            continue;
-        }
-
-        let result = is_squashed_branch(&base_branch_name, &local_branch_name);
-        if result.is_err() {
-            eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
-            std::process::exit(1);
-        }
-
-        let is_squashed = result.unwrap();
-        if is_squashed {
-            deletable_branch_names.push(local_branch_name);
-        }
+    let result = pick_squashed_branches(base_branch_name);
+    if result.is_err() {
+        eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
+        std::process::exit(1);
     }
+
+    let mut squashed_branch_names = result.unwrap();
+    deletable_branch_names.append(&mut squashed_branch_names);
 
     deletable_branch_names.sort();
     deletable_branch_names.dedup();
 
-    println!("{:?}", deletable_branch_names);
+    println!("Deletable branches: {:?}", deletable_branch_names);
 
     Ok(())
 }
