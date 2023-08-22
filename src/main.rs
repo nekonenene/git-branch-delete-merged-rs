@@ -3,7 +3,7 @@ use anyhow::Result;
 use clap::Parser;
 use std::process::Command;
 
-use git_branch_delete_merged::{exec_command, pick_merged_branches, pick_squashed_branches};
+use git_branch_delete_merged::{exec_command, pick_merged_branches, pick_squashed_branches, delete_branches_with_prompt};
 
 #[derive(Parser)]
 struct Args {
@@ -57,10 +57,16 @@ fn main() -> Result<()> {
     deletable_branch_names.dedup();
 
     if deletable_branch_names.len() == 0 {
-        eprintln!("{}", Yellow.paint(format!("There is no branch which has merged into {}", base_branch_name)));
+        println!("{}", Yellow.paint(format!("There is no branch which has merged into {}", base_branch_name)));
         std::process::exit(0);
     } else {
         println!("Found {} merged branches: [{}]", deletable_branch_names.len(), deletable_branch_names.join(" "));
+    }
+
+    let result = delete_branches_with_prompt(base_branch_name, &deletable_branch_names);
+    if result.is_err() {
+        eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
+        std::process::exit(1);
     }
 
     Ok(())

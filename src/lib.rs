@@ -1,3 +1,4 @@
+use ansi_term::Colour::Yellow;
 use anyhow::{anyhow, Result};
 use std::process::Command;
 
@@ -60,7 +61,7 @@ pub fn pick_squashed_branches(base_branch_name: &str) -> Result<Vec<String>> {
     let local_branch_names: Vec<&str> = local_branch_names_with_newline.split('\n').collect();
 
     // Add squashed branche names into squashed_branch_names
-    for local_branch_name in local_branch_names {
+    for local_branch_name in local_branch_names.into_iter() {
         if local_branch_name == base_branch_name {
             continue;
         }
@@ -118,4 +119,29 @@ pub fn is_squashed_branch(base_branch_name: &str, target_branch_name: &str) -> R
     } else {
         Ok(false)
     }
+}
+
+pub fn delete_branches_with_prompt(base_branch_name: &str, deletable_branch_names: &Vec<String>) -> Result<()> {
+    let result = exec_command("git", &["rev-parse", "--abbrev-ref", "HEAD"]);
+    if result.is_err() {
+        return Err(result.unwrap_err());
+    }
+
+    let current_branch_name = result.unwrap();
+
+    for target_branch_name in deletable_branch_names.into_iter() {
+        let target_branch_name = target_branch_name.to_string();
+        if target_branch_name == base_branch_name {
+            continue;
+        }
+
+        if target_branch_name == current_branch_name {
+            println!("{}", Yellow.paint(format!("Skipped '{}' branch because it is current branch", target_branch_name)));
+            continue;
+        }
+
+        println!("Start deleting branch: {}", target_branch_name);
+    }
+
+    Ok(())
 }
