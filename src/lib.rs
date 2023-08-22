@@ -9,8 +9,9 @@ use std::process::Command;
 /// * `program` - Command name
 /// * `args` - Arguments
 pub fn exec_command(program: &str, args: &[&str]) -> Result<String> {
-    let result = Command::new(program).args(args).output();
     let args_str = args.join(" ");
+
+    let result = Command::new(program).args(args).output();
 
     match result {
         Ok(output) => {
@@ -27,6 +28,33 @@ pub fn exec_command(program: &str, args: &[&str]) -> Result<String> {
             return Err(anyhow!("\"{} {}\" failed:\n{}", program, args_str, err));
         }
     }
+}
+
+/// Exec command in a child process
+///
+/// # Arguments
+/// * `program` - Command name
+/// * `args` - Arguments
+fn spawn_command(program: &str, args: &[&str]) -> Result<()> {
+    let args_str = args.join(" ");
+
+    let result = Command::new(program).args(args).spawn();
+    if result.is_err() {
+        return Err(anyhow!(result.unwrap_err()));
+    }
+
+    let mut child = result.unwrap();
+    let result = child.wait();
+    if result.is_err() {
+        return Err(anyhow!(result.unwrap_err()));
+    }
+
+    let exit_status = result.unwrap();
+    if !exit_status.success() {
+        println!("{}", Yellow.paint(format!("[WARN] \"{} {}\" received {}", program, args_str, exit_status)));
+    }
+
+    Ok(())
 }
 
 /// Returns branch names which has merged (Not include squashed)
@@ -174,10 +202,16 @@ fn delete_branch_prompt(target_branch_name: &str) -> Result<bool> {
                 return Ok(true);
             }
             "l" | "log" => {
-                println!("LOG!!!");
+                let result = spawn_command("git", &["log", target_branch_name]);
+                if result.is_err() {
+                    return Err(result.unwrap_err());
+                }
             }
             "d" | "diff" => {
-                println!("DIFF!!!");
+                let result = spawn_command("git", &["show", target_branch_name, "-v"]);
+                if result.is_err() {
+                    return Err(result.unwrap_err());
+                }
             }
             "q" | "quit" => {
                 println!("{}", Yellow.paint("Suspends processing"));
