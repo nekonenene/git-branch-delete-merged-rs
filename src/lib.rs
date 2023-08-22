@@ -27,12 +27,29 @@ pub fn exec_command(program: &str, args: &[&str]) -> Result<String> {
     }
 }
 
+/// Returns branch names which has merged (Not include squashed)
+///
+/// # Arguments
+/// * `base_branch_name` - Base branch (e.g. main, develop)
+pub fn pick_merged_branches(base_branch_name: &str) -> Result<Vec<String>> {
+    let result = exec_command("git", &["branch", "--merged", base_branch_name, "--format", "%(refname:short)"]);
+    if result.is_err() {
+        return Err(result.unwrap_err());
+    }
+
+    let merged_branch_names_with_newline = result.unwrap();
+    let mut merged_branch_names: Vec<String> = merged_branch_names_with_newline.split('\n').map(str::to_string).collect();
+    merged_branch_names.retain(|branch_name| branch_name != base_branch_name);
+
+    Ok(merged_branch_names)
+}
+
 /// Returns branch names which has squashed and merged
 ///
 /// # Arguments
 /// * `base_branch_name` - Base branch (e.g. main, develop)
 pub fn pick_squashed_branches(base_branch_name: &str) -> Result<Vec<String>> {
-    let mut deletable_branch_names = Vec::new();
+    let mut squashed_branch_names = Vec::new();
 
     let result = exec_command("git", &["for-each-ref", "refs/heads/", "--format", "%(refname:short)"]);
     if result.is_err() {
@@ -42,9 +59,9 @@ pub fn pick_squashed_branches(base_branch_name: &str) -> Result<Vec<String>> {
     let local_branch_names_with_newline = result.unwrap();
     let local_branch_names: Vec<&str> = local_branch_names_with_newline.split('\n').collect();
 
-    // Add squashed branche names into deletable_branch_names
+    // Add squashed branche names into squashed_branch_names
     for local_branch_name in local_branch_names {
-        if local_branch_name.to_string().eq(base_branch_name) {
+        if local_branch_name == base_branch_name {
             continue;
         }
 
@@ -55,11 +72,11 @@ pub fn pick_squashed_branches(base_branch_name: &str) -> Result<Vec<String>> {
 
         let is_squashed = result.unwrap();
         if is_squashed {
-            deletable_branch_names.push(local_branch_name.to_string());
+            squashed_branch_names.push(local_branch_name.to_string());
         }
     }
 
-    Ok(deletable_branch_names)
+    Ok(squashed_branch_names)
 }
 
 /// Returns whether target branch has squashed and merged

@@ -3,7 +3,7 @@ use anyhow::Result;
 use clap::Parser;
 use std::process::Command;
 
-use git_branch_delete_merged::{exec_command, pick_squashed_branches};
+use git_branch_delete_merged::{exec_command, pick_merged_branches, pick_squashed_branches};
 
 #[derive(Parser)]
 struct Args {
@@ -33,6 +33,15 @@ fn main() -> Result<()> {
     let local_branch_names: Vec<&str> = local_branch_names_with_newline.split('\n').collect();
 
     println!("Local branches: {:?}", local_branch_names);
+
+    let result = pick_merged_branches(base_branch_name);
+    if result.is_err() {
+        eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
+        std::process::exit(1);
+    }
+
+    let mut merged_branch_names = result.unwrap();
+    deletable_branch_names.append(&mut merged_branch_names);
 
     let result = pick_squashed_branches(base_branch_name);
     if result.is_err() {
