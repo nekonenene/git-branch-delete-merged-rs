@@ -1,6 +1,11 @@
 use anyhow::{anyhow, Result};
 use std::process::Command;
 
+/// Exec command, and returns stdout string
+///
+/// # Arguments
+/// * `program` - Command name
+/// * `args` - Arguments
 pub fn exec_command(program: &str, args: &[&str]) -> Result<String> {
     let result = Command::new(program).args(args).output();
     let args_str = args.join(" ");
@@ -22,6 +27,10 @@ pub fn exec_command(program: &str, args: &[&str]) -> Result<String> {
     }
 }
 
+/// Returns branch names which has squashed and merged
+///
+/// # Arguments
+/// * `base_branch_name` - Base branch (e.g. main, develop)
 pub fn pick_squashed_branches(base_branch_name: &str) -> Result<Vec<String>> {
     let mut deletable_branch_names = Vec::new();
 
@@ -56,7 +65,6 @@ pub fn pick_squashed_branches(base_branch_name: &str) -> Result<Vec<String>> {
 /// Returns whether target branch has squashed and merged
 ///
 /// # Arguments
-///
 /// * `base_branch_name` - Base branch (e.g. main, develop)
 /// * `target_branch_name` - Branch to be checked
 pub fn is_squashed_branch(base_branch_name: &str, target_branch_name: &str) -> Result<bool> {
