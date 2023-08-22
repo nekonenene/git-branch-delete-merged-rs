@@ -3,7 +3,7 @@ use anyhow::Result;
 use clap::Parser;
 use std::process::Command;
 
-use git_branch_delete_merged::exec_command;
+use git_branch_delete_merged::{exec_command, is_squashed_branch};
 
 #[derive(Parser)]
 struct Args {
@@ -14,7 +14,6 @@ struct Args {
 fn main() -> Result<()> {
     let args = Args::parse();
     let base_branch_name = args.base_branch;
-    println!("Base branch name: {}", base_branch_name);
 
     let output = Command::new("git").arg("version").output();
     if output.is_err() {
@@ -36,14 +35,15 @@ fn main() -> Result<()> {
     for local_branch_name in local_branch_names.iter() {
         println!("Branch name: {}", local_branch_name);
 
-        let output = exec_command("git", &["rev-parse", local_branch_name]);
-        if output.is_err() {
-            eprintln!("{}", Red.paint(&output.unwrap_err().to_string()));
+        let result = is_squashed_branch(&base_branch_name, &local_branch_name);
+        if result.is_err() {
+            eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
             std::process::exit(1);
         }
 
-        let latest_commit_id = output.unwrap();
-        println!("{}", latest_commit_id);
+        let is_squashed = result.unwrap();
+
+        println!("Squashed: {}", is_squashed);
     }
 
     Ok(())
