@@ -97,6 +97,12 @@ fn is_squashed_branch(base_branch_name: &str, target_branch_name: &str) -> Resul
     }
 }
 
+/// Delete each branch after the confirmation
+///
+/// # Arguments
+/// * `base_branch_name` - Base branch (e.g. main, develop)
+/// * `deletable_branch_names` - List of branches to be deleted
+/// * `yes_flag` - If true, delete all branches without confirmation
 pub fn delete_branches_with_prompt(base_branch_name: &str, deletable_branch_names: &Vec<String>, yes_flag: bool) -> Result<()> {
     let result = exec_command("git", &["rev-parse", "--abbrev-ref", "HEAD"]);
     if result.is_err() {
@@ -126,6 +132,10 @@ pub fn delete_branches_with_prompt(base_branch_name: &str, deletable_branch_name
 }
 
 /// Returns whether the target branch deleted
+///
+/// # Arguments
+/// * `target_branch_name` - Branch name to be deleted
+/// * `yes_flag` - If true, delete the branch without confirmation
 fn delete_branch_prompt(target_branch_name: &str, yes_flag: bool) -> Result<bool> {
     let mut loop_end_flag = false;
 
