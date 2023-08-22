@@ -4,6 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["nekonenene"]
+description = "Delete local branches that have been merged (Includes \"Squash and merge\" also)"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/nekonenene/git-branch-delete-merged-rs"
+categories = ["command-line-interface"]
+keywords = ["git"]
 
 [dependencies]
 ansi_term = "0.12.1"

@@ -6,6 +6,7 @@ use std::process::Command;
 use git_branch_delete_merged::{exec_command, pick_merged_branches, pick_squashed_branches, delete_branches_with_prompt};
 
 #[derive(Parser)]
+#[command(author = "nekonenene", version, about)]
 struct Args {
     #[arg(required = true, index = 1, help = "Base branch name (e.g. main, develop)")]
     base_branch: String,
