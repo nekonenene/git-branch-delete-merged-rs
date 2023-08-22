@@ -23,6 +23,12 @@ fn main() -> Result<()> {
         std::process::exit(1);
     }
 
+    let result = exec_command("git", &["rev-parse", "--verify", base_branch_name]);
+    if result.is_err() {
+        eprintln!("{}", Red.paint(format!("Base branch not found: {}", base_branch_name)));
+        std::process::exit(1);
+    }
+
     let result = exec_command("git", &["for-each-ref", "refs/heads/", "--format", "%(refname:short)"]);
     if result.is_err() {
         eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
