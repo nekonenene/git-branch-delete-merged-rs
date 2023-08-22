@@ -15,6 +15,8 @@ fn main() -> Result<()> {
     let args = Args::parse();
     let base_branch_name = args.base_branch;
 
+    let mut deletable_branch_names = Vec::new();
+
     let output = Command::new("git").arg("version").output();
     if output.is_err() {
         eprintln!("{}", Red.paint("Command not found: git"));
@@ -32,8 +34,13 @@ fn main() -> Result<()> {
 
     println!("{:?}", local_branch_names);
 
+    // Add squashed branche names into deletable_branch_names
     for local_branch_name in local_branch_names.iter() {
         println!("Branch name: {}", local_branch_name);
+
+        if local_branch_name.eq(&base_branch_name) {
+            continue;
+        }
 
         let result = is_squashed_branch(&base_branch_name, &local_branch_name);
         if result.is_err() {
@@ -42,9 +49,12 @@ fn main() -> Result<()> {
         }
 
         let is_squashed = result.unwrap();
-
-        println!("Squashed: {}", is_squashed);
+        if is_squashed {
+            deletable_branch_names.push(local_branch_name);
+        }
     }
+
+    println!("{:?}", deletable_branch_names);
 
     Ok(())
 }
