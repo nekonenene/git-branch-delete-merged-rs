@@ -1,5 +1,6 @@
 use ansi_term::Colour::Yellow;
 use anyhow::{anyhow, Result};
+use std::io::Write; // for stdout().flush()
 use std::process::Command;
 
 /// Exec command, and returns stdout string
@@ -140,8 +141,64 @@ pub fn delete_branches_with_prompt(base_branch_name: &str, deletable_branch_name
             continue;
         }
 
-        println!("Start deleting branch: {}", target_branch_name);
+        let result = delete_branch_prompt(&target_branch_name);
+        if result.is_err() {
+            return Err(result.unwrap_err());
+        }
     }
 
     Ok(())
+}
+
+/// Returns whether the target branch deleted
+fn delete_branch_prompt(target_branch_name: &str) -> Result<bool> {
+    let mut loop_end_flag = false;
+
+    while !loop_end_flag {
+        print!("\nAre you sure to delete {} branch? [y|n|l|d|q|help]: ", Yellow.paint(format!("'{}'", target_branch_name)));
+        std::io::stdout().flush().unwrap();
+
+        let mut user_input = String::new();
+        let stdin = std::io::stdin();
+        let result = stdin.read_line(&mut user_input);
+        if result.is_err() {
+            return Err(anyhow!(result.unwrap_err()));
+        }
+
+        let user_input = user_input.trim_end_matches('\n');
+
+        match user_input {
+            "y" | "yes" => {
+                println!("YES!!!");
+
+                return Ok(true);
+            }
+            "l" | "log" => {
+                println!("LOG!!!");
+            }
+            "d" | "diff" => {
+                println!("DIFF!!!");
+            }
+            "q" | "quit" => {
+                println!("{}", Yellow.paint("Suspends processing"));
+                std::process::exit(0);
+            }
+            "h" | "help" => {
+                println!("\n\
+                    y: Yes, delete the branch\n\
+                    n: No, skip deleting\n\
+                    l: Show git logs of the branch\n\
+                    d: Show the latest commit of the branch and its diff\n\
+                    q: Quit immediately\n\
+                    h: Display this help\
+                ");
+            }
+            _ => {
+                println!("Skipped");
+                loop_end_flag = true;
+            }
+        }
+    }
+
+    Ok(false)
 }
