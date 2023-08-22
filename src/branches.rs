@@ -4,7 +4,7 @@ use std::io::Write;
 
 use crate::command::{exec_command, spawn_command};
 
-/// Returns branch names which has merged (Not include squashed)
+/// Return branch names which has merged (Not include squashed)
 ///
 /// # Arguments
 /// * `base_branch_name` - Base branch (e.g. main, develop)
@@ -21,7 +21,7 @@ pub fn pick_merged_branches(base_branch_name: &str) -> Result<Vec<String>> {
     Ok(merged_branch_names)
 }
 
-/// Returns branch names which has squashed and merged
+/// Return branch names which has squashed and merged
 ///
 /// # Arguments
 /// * `base_branch_name` - Base branch (e.g. main, develop)
@@ -56,7 +56,7 @@ pub fn pick_squashed_branches(base_branch_name: &str) -> Result<Vec<String>> {
     Ok(squashed_branch_names)
 }
 
-/// Returns whether target branch has squashed and merged
+/// Return whether target branch has squashed and merged
 ///
 /// # Arguments
 /// * `base_branch_name` - Base branch (e.g. main, develop)
@@ -131,7 +131,7 @@ pub fn delete_branches_with_prompt(base_branch_name: &str, deletable_branch_name
     Ok(())
 }
 
-/// Returns whether the target branch deleted
+/// Show prompt to confirm deletion, and return whether the target branch deleted
 ///
 /// # Arguments
 /// * `target_branch_name` - Branch name to be deleted

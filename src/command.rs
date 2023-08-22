@@ -2,7 +2,7 @@ use ansi_term::Colour::Yellow;
 use anyhow::{anyhow, Result};
 use std::process::Command;
 
-/// Exec command, and returns stdout string
+/// Exec command, and return stdout string
 ///
 /// # Arguments
 /// * `program` - Command name
