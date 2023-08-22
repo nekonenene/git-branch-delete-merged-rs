@@ -8,8 +8,9 @@ struct Args {
     base_branch: String,
 }
 
-fn exec_command(program: &str) -> Result<String> {
-    let output = Command::new(program).output();
+fn exec_command(program: &str, args: &[&str]) -> Result<String> {
+    let output = Command::new(program).args(args).output();
+    let args_str = args.join(" ");
 
     match output {
         Ok(output) => {
@@ -18,11 +19,11 @@ fn exec_command(program: &str) -> Result<String> {
                 return Ok(stdout);
             } else {
                 let stderr = String::from_utf8(output.stderr)?;
-                return Err(anyhow!("'{}' received {}\n{}", program, output.status, stderr));
+                return Err(anyhow!("\"{} {}\" received {}\n{}", program, args_str, output.status, stderr));
             }
         }
         Err(err) => {
-            return Err(anyhow!("'{}' failed:\n{}", program, err));
+            return Err(anyhow!("\"{} {}\" failed:\n{}", program, args_str, err));
         }
     }
 }
@@ -53,7 +54,7 @@ fn main() -> Result<()> {
         }
     }
 
-    let output = exec_command("git");
+    let output = exec_command("git", &["afor-each-ref", "refs/heads/", "--format", "%(refname:short)"]);
 
     if output.is_err() {
         eprintln!("{}", output.unwrap_err());
