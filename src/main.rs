@@ -49,5 +49,19 @@ fn main() -> Result<()> {
 
     println!("{:?}", local_branch_names);
 
+    for local_branch_name in local_branch_names.iter() {
+        println!("Branch name: {}", local_branch_name);
+
+        let output = exec_command("git", &["rev-parse", local_branch_name]);
+
+        if output.is_err() {
+            eprintln!("{}", output.unwrap_err());
+            std::process::exit(1);
+        }
+
+        let latest_commit_id = output.unwrap();
+        println!("{}", latest_commit_id);
+    }
+
     Ok(())
 }
