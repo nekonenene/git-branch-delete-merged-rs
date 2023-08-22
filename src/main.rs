@@ -30,6 +30,10 @@ fn exec_command(program: &str, args: &[&str]) -> Result<String> {
 }
 
 fn main() -> Result<()> {
+    let args = Args::parse();
+    let base_branch_name = args.base_branch;
+    println!("Branch branch name: {}", base_branch_name);
+
     let output = Command::new("git").arg("version").output();
 
     if output.is_err() {
