@@ -1,9 +1,13 @@
+mod branches;
+mod command;
+
 use ansi_term::Colour::{Red, Yellow, Green};
 use anyhow::Result;
 use clap::Parser;
 use std::process::Command;
 
-use git_branch_delete_merged::{exec_command, pick_merged_branches, pick_squashed_branches, delete_branches_with_prompt};
+use crate::branches::{pick_merged_branches, pick_squashed_branches, delete_branches_with_prompt};
+use crate::command::exec_command;
 
 #[derive(Parser)]
 #[command(author = "nekonenene", version, about)]
