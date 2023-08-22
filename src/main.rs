@@ -10,11 +10,14 @@ use git_branch_delete_merged::{exec_command, pick_merged_branches, pick_squashed
 struct Args {
     #[arg(required = true, index = 1, help = "Base branch name (e.g. main, develop)")]
     base_branch: String,
+    #[arg(required = false, long = "yes", short = 'y', action = clap::ArgAction::SetTrue, help = "Delete all merged branches without confirmation")]
+    yes_flag: bool,
 }
 
 fn main() -> Result<()> {
     let args = Args::parse();
-    let base_branch_name = &args.base_branch;
+    let base_branch_name = args.base_branch.as_str();
+    let yes_flag = args.yes_flag;
 
     let mut deletable_branch_names = Vec::new();
 
@@ -64,7 +67,7 @@ fn main() -> Result<()> {
         println!("Found {} merged branches: [{}]", Green.paint(format!("{}", deletable_branch_names.len())), deletable_branch_names.join(" "));
     }
 
-    let result = delete_branches_with_prompt(base_branch_name, &deletable_branch_names);
+    let result = delete_branches_with_prompt(base_branch_name, &deletable_branch_names, yes_flag);
     if result.is_err() {
         eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
         std::process::exit(1);

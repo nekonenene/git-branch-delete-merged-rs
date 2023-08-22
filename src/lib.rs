@@ -150,7 +150,7 @@ fn is_squashed_branch(base_branch_name: &str, target_branch_name: &str) -> Resul
     }
 }
 
-pub fn delete_branches_with_prompt(base_branch_name: &str, deletable_branch_names: &Vec<String>) -> Result<()> {
+pub fn delete_branches_with_prompt(base_branch_name: &str, deletable_branch_names: &Vec<String>, yes_flag: bool) -> Result<()> {
     let result = exec_command("git", &["rev-parse", "--abbrev-ref", "HEAD"]);
     if result.is_err() {
         return Err(result.unwrap_err());
@@ -169,7 +169,7 @@ pub fn delete_branches_with_prompt(base_branch_name: &str, deletable_branch_name
             continue;
         }
 
-        let result = delete_branch_prompt(&target_branch_name);
+        let result = delete_branch_prompt(&target_branch_name, yes_flag);
         if result.is_err() {
             return Err(result.unwrap_err());
         }
@@ -179,23 +179,28 @@ pub fn delete_branches_with_prompt(base_branch_name: &str, deletable_branch_name
 }
 
 /// Returns whether the target branch deleted
-fn delete_branch_prompt(target_branch_name: &str) -> Result<bool> {
+fn delete_branch_prompt(target_branch_name: &str, yes_flag: bool) -> Result<bool> {
     let mut loop_end_flag = false;
 
     while !loop_end_flag {
-        print!("\nAre you sure to delete {} branch? [y|n|l|d|q|help]: ", Yellow.paint(format!("'{}'", target_branch_name)));
-        std::io::stdout().flush().unwrap();
+        let input =
+            if yes_flag {
+                String::from("yes")
+            } else {
+                print!("\nAre you sure to delete {} branch? [y|n|l|d|q|help]: ", Yellow.paint(format!("'{}'", target_branch_name)));
+                std::io::stdout().flush().unwrap();
 
-        let mut user_input = String::new();
-        let stdin = std::io::stdin();
-        let result = stdin.read_line(&mut user_input);
-        if result.is_err() {
-            return Err(anyhow!(result.unwrap_err()));
-        }
+                let mut user_input = String::new();
+                let stdin = std::io::stdin();
+                let result = stdin.read_line(&mut user_input);
+                if result.is_err() {
+                    return Err(anyhow!(result.unwrap_err()));
+                }
 
-        let user_input = user_input.trim_end_matches('\n');
+                user_input.trim_end_matches('\n').to_string()
+            };
 
-        match user_input {
+        match input.as_str() {
             "y" | "yes" => {
                 let result = exec_command("git", &["rev-parse", target_branch_name]);
                 if result.is_err() {
