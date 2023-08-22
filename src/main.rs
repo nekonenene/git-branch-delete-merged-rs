@@ -1,4 +1,4 @@
-use ansi_term::Colour::Red;
+use ansi_term::Colour::{Red, Yellow};
 use anyhow::Result;
 use clap::Parser;
 use std::process::Command;
@@ -50,7 +50,12 @@ fn main() -> Result<()> {
     deletable_branch_names.sort();
     deletable_branch_names.dedup();
 
-    println!("Deletable branches: {:?}", deletable_branch_names);
+    if deletable_branch_names.len() == 0 {
+        eprintln!("{}", Yellow.paint(format!("There is no branch which has merged into {}", base_branch_name)));
+        std::process::exit(0);
+    } else {
+        println!("Found {} merged branches: [{}]", deletable_branch_names.len(), deletable_branch_names.join(" "));
+    }
 
     Ok(())
 }
