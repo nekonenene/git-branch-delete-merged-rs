@@ -16,7 +16,8 @@ fn exec_command(program: &str, args: &[&str]) -> Result<String> {
         Ok(output) => {
             if output.status.success() {
                 let stdout = String::from_utf8(output.stdout)?;
-                return Ok(stdout);
+                let trimmed_stdout = stdout.trim_end_matches('\n').to_string();
+                return Ok(trimmed_stdout);
             } else {
                 let stderr = String::from_utf8(output.stderr)?;
                 return Err(anyhow!("\"{} {}\" received {}\n{}", program, args_str, output.status, stderr));
@@ -36,25 +37,7 @@ fn main() -> Result<()> {
         std::process::exit(1);
     }
 
-    let output = Command::new("git")
-        .args(["for-each-ref", "refs/heads/", "--format", "%(refname:short)"])
-        .output();
-
-    match output {
-        Ok(output) => {
-            println!("status: {}", output.status);
-            let stdout = String::from_utf8(output.stdout)?;
-            println!("stdout: {}", stdout);
-            let stderr = String::from_utf8(output.stderr)?;
-            println!("stderr: {}", stderr);
-        }
-        Err(err) => {
-            eprintln!("git command failed: {}", err);
-            std::process::exit(1);
-        }
-    }
-
-    let output = exec_command("git", &["afor-each-ref", "refs/heads/", "--format", "%(refname:short)"]);
+    let output = exec_command("git", &["for-each-ref", "refs/heads/", "--format", "%(refname:short)"]);
 
     if output.is_err() {
         eprintln!("{}", output.unwrap_err());
