@@ -1,5 +1,6 @@
-use clap::Parser;
+use ansi_term::Colour::Red;
 use anyhow::{anyhow, Result};
+use clap::Parser;
 use std::process::Command;
 
 #[derive(Parser)]
@@ -20,7 +21,7 @@ fn exec_command(program: &str, args: &[&str]) -> Result<String> {
                 return Ok(trimmed_stdout);
             } else {
                 let stderr = String::from_utf8(output.stderr)?;
-                return Err(anyhow!("\"{} {}\" received {}\n{}", program, args_str, output.status, stderr));
+                return Err(anyhow!("\"{} {}\" received {}\n\n{}", program, args_str, output.status, stderr));
             }
         }
         Err(err) => {
@@ -32,19 +33,17 @@ fn exec_command(program: &str, args: &[&str]) -> Result<String> {
 fn main() -> Result<()> {
     let args = Args::parse();
     let base_branch_name = args.base_branch;
-    println!("Branch branch name: {}", base_branch_name);
+    println!("Base branch name: {}", base_branch_name);
 
     let output = Command::new("git").arg("version").output();
-
     if output.is_err() {
-        eprintln!("Command not found: git {}", output.unwrap_err());
+        eprintln!("{}", Red.paint("Command not found: git"));
         std::process::exit(1);
     }
 
     let output = exec_command("git", &["for-each-ref", "refs/heads/", "--format", "%(refname:short)"]);
-
     if output.is_err() {
-        eprintln!("{}", output.unwrap_err());
+        eprintln!("{}", Red.paint(&output.unwrap_err().to_string()));
         std::process::exit(1);
     }
 
@@ -57,9 +56,8 @@ fn main() -> Result<()> {
         println!("Branch name: {}", local_branch_name);
 
         let output = exec_command("git", &["rev-parse", local_branch_name]);
-
         if output.is_err() {
-            eprintln!("{}", output.unwrap_err());
+            eprintln!("{}", Red.paint(&output.unwrap_err().to_string()));
             std::process::exit(1);
         }
 
