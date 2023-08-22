@@ -1,4 +1,4 @@
-use ansi_term::Colour::Yellow;
+use ansi_term::Colour::{Yellow, Green};
 use anyhow::{anyhow, Result};
 use std::io::Write; // for stdout().flush()
 use std::process::Command;
@@ -197,7 +197,20 @@ fn delete_branch_prompt(target_branch_name: &str) -> Result<bool> {
 
         match user_input {
             "y" | "yes" => {
-                println!("YES!!!");
+                let result = exec_command("git", &["rev-parse", target_branch_name]);
+                if result.is_err() {
+                    return Err(result.unwrap_err());
+                }
+
+                let latest_commit_id = result.unwrap();
+
+                let result = exec_command("git", &["branch", "-D", target_branch_name]);
+                if result.is_err() {
+                    return Err(result.unwrap_err());
+                }
+
+                println!("{}", Green.paint(format!("Deleted '{}' branch", target_branch_name)));
+                println!("You can recreate this branch with `git branch {} {}`", target_branch_name, latest_commit_id);
 
                 return Ok(true);
             }
