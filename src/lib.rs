@@ -85,7 +85,7 @@ pub fn pick_squashed_branches(base_branch_name: &str) -> Result<Vec<String>> {
 /// # Arguments
 /// * `base_branch_name` - Base branch (e.g. main, develop)
 /// * `target_branch_name` - Branch to be checked
-pub fn is_squashed_branch(base_branch_name: &str, target_branch_name: &str) -> Result<bool> {
+fn is_squashed_branch(base_branch_name: &str, target_branch_name: &str) -> Result<bool> {
     let result = exec_command("git", &["merge-base", base_branch_name, target_branch_name]);
     if result.is_err() {
         return Err(result.unwrap_err());
