@@ -29,11 +29,6 @@ fn main() -> Result<()> {
         std::process::exit(1);
     }
 
-    let local_branch_names_with_newline = result.unwrap();
-    let local_branch_names: Vec<&str> = local_branch_names_with_newline.split('\n').collect();
-
-    println!("Local branches: {:?}", local_branch_names);
-
     let result = pick_merged_branches(base_branch_name);
     if result.is_err() {
         eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
