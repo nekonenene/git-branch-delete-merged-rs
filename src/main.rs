@@ -54,6 +54,9 @@ fn main() -> Result<()> {
         }
     }
 
+    deletable_branch_names.sort();
+    deletable_branch_names.dedup();
+
     println!("{:?}", deletable_branch_names);
 
     Ok(())
