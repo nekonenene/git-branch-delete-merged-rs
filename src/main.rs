@@ -42,9 +42,12 @@ fn main() -> Result<()> {
     if output.is_err() {
         eprintln!("{}", output.unwrap_err());
         std::process::exit(1);
-    } else {
-        println!("{}", output.unwrap());
     }
+
+    let local_branch_names_with_newline = output.unwrap();
+    let local_branch_names: Vec<&str> = local_branch_names_with_newline.split('\n').collect();
+
+    println!("{:?}", local_branch_names);
 
     Ok(())
 }
