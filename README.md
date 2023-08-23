@@ -7,8 +7,6 @@ It is based on https://github.com/nekonenene/git-branch-delete-merged written in
 
 ## Installation
 
-### Using cargo
-
 After [installing cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html),
 
 ```sh
@@ -21,12 +19,6 @@ cargo install --force --git https://github.com/nekonenene/git-branch-delete-merg
 # Uninstall
 cargo uninstall git-branch-delete-merged
 ```
-
-### Download binary
-
-Visit https://github.com/nekonenene/git-branch-delete-merged-rs/releases, and download binary.
-
-Then, You can rename the downloaded file to `git-branch-delete-merged` and put it in `/usr/local/bin`.
 
 
 ## Usage
