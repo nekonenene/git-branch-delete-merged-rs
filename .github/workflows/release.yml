@@ -17,25 +17,25 @@ jobs:
         targets:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
-            filename: git-branch-delete-merged-Linux-x86_64
+            filename: git-branch-delete-merged_Linux_x86_64
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-latest
-            filename: git-branch-delete-merged-Linux-arm64
+            filename: git-branch-delete-merged_Linux_arm64
           - target: x86_64-apple-darwin
             os: macos-latest
-            filename: git-branch-delete-merged-Darwin-x86_64
+            filename: git-branch-delete-merged_Darwin_x86_64
           - target: aarch64-apple-darwin
             os: macos-latest
-            filename: git-branch-delete-merged-Darwin-arm64
+            filename: git-branch-delete-merged_Darwin_arm64
           # - target: i686-pc-windows-msvc
           #   os: windows-latest
-          #   filename: git-branch-delete-merged-Windows-32bit.exe
+          #   filename: git-branch-delete-merged_Windows_32bit.exe
           # - target: x86_64-pc-windows-msvc
           #   os: windows-latest
-          #   filename: git-branch-delete-merged-Windows-x86_64.exe
+          #   filename: git-branch-delete-merged_Windows_x86_64.exe
           # - target: aarch64-pc-windows-msvc
           #   os: windows-latest
-          #   filename: git-branch-delete-merged-Windows-arm64.exe
+          #   filename: git-branch-delete-merged_Windows_arm64.exe
     runs-on: ${{ matrix.targets.os }}
     steps:
       - name: Checkout
@@ -82,10 +82,10 @@ jobs:
         with:
           generate_release_notes: true
           files: |
-            git-branch-delete-merged-Linux-x86_64
-            git-branch-delete-merged-Linux-arm64
-            git-branch-delete-merged-Darwin-x86_64
-            git-branch-delete-merged-Darwin-arm64
-          # git-branch-delete-merged-Windows-32bit.exe
-          # git-branch-delete-merged-Windows-x86_64.exe
-          # git-branch-delete-merged-Windows-arm64.exe
+            git-branch-delete-merged_Linux_x86_64
+            git-branch-delete-merged_Linux_arm64
+            git-branch-delete-merged_Darwin_x86_64
+            git-branch-delete-merged_Darwin_arm64
+          # git-branch-delete-merged_Windows_32bit.exe
+          # git-branch-delete-merged_Windows_x86_64.exe
+          # git-branch-delete-merged_Windows_arm64.exe

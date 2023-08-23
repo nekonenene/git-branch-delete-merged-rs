@@ -13,7 +13,7 @@ macOS or Linux can do the following.
 
 ```sh
 # Install / Update
-curl -fL https://github.com/nekonenene/git-branch-delete-merged-rs/releases/latest/download/git-branch-delete-merged-$(uname -s)-$(uname -m) -o git-branch-delete-merged && chmod +x git-branch-delete-merged
+curl -fL https://github.com/nekonenene/git-branch-delete-merged-rs/releases/latest/download/git-branch-delete-merged_$(uname -s)_$(uname -m) -o git-branch-delete-merged && chmod +x git-branch-delete-merged
 mv git-branch-delete-merged /usr/local/bin
 
 # Uninstall
