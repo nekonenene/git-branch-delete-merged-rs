@@ -50,11 +50,11 @@ jobs:
         with:
           use-cross: true
           command: build
-          args: --release --locked
+          args: --release --locked --target=${{ matrix.targets.target }}
       - name: Rename result
         run: |
-          rm target/release/git-branch-delete-merged.d
-          cp target/release/git-branch-delete-merged* ${{ matrix.targets.filename }}
+          rm target/${{ matrix.targets.target }}/release/git-branch-delete-merged.d
+          cp target/${{ matrix.targets.target }}/release/git-branch-delete-merged* ${{ matrix.targets.filename }}
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
