@@ -176,8 +176,12 @@ fn delete_branch_prompt(target_branch_name: &str, yes_flag: bool) -> Result<bool
 
                 return Ok(true);
             }
+            "n" | "no" => {
+                println!("Skipped");
+                loop_end_flag = true;
+            }
             "l" | "log" => {
-                let result = spawn_command("git", &["log", target_branch_name]);
+                    let result = spawn_command("git", &["log", target_branch_name]);
                 if result.is_err() {
                     return Err(result.unwrap_err());
                 }
@@ -202,10 +206,7 @@ fn delete_branch_prompt(target_branch_name: &str, yes_flag: bool) -> Result<bool
                     h: Display this help\
                 ");
             }
-            _ => {
-                println!("Skipped");
-                loop_end_flag = true;
-            }
+            _ => {}
         }
     }
 
