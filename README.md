@@ -22,7 +22,7 @@ cargo install --force --git https://github.com/nekonenene/git-branch-delete-merg
 cargo uninstall git-branch-delete-merged
 ```
 
-### Download binary
+### Using binary
 
 macOS or Linux can do the following.
 
