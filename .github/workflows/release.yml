@@ -22,16 +22,16 @@ jobs:
             os: ubuntu-latest
             filename: git-branch-delete-merged-linux-arm64
           - target: x86_64-pc-windows-msvc
-            os: ubuntu-latest
+            os: windows-latest
             filename: git-branch-delete-merged-win-x86_64.exe
           - target: aarch64-pc-windows-msvc
-            os: ubuntu-latest
+            os: windows-latest
             filename: git-branch-delete-merged-win-arm64.exe
           - target: x86_64-apple-darwin
-            os: ubuntu-latest
+            os: macos-latest
             filename: git-branch-delete-merged-mac-x86_64
           - target: aarch64-apple-darwin
-            os: ubuntu-latest
+            os: macos-latest
             filename: git-branch-delete-merged-mac-arm64
     runs-on: ${{ matrix.targets.os }}
     steps:
