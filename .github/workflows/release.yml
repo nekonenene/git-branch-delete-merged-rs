@@ -12,6 +12,7 @@ permissions:
 jobs:
   release:
     strategy:
+      fail-fast: false # Wait finishing other parallel jobs
       matrix:
         targets:
           - target: x86_64-unknown-linux-gnu
@@ -40,6 +41,7 @@ jobs:
           args: --release --locked
       - name: Rename result
         run: |
+          rm target/release/git-branch-delete-merged.d
           cp target/release/git-branch-delete-merged* ${{ matrix.targets.filename }}
       - name: Upload artifact
         uses: actions/upload-artifact@v3
