@@ -21,6 +21,9 @@ jobs:
           - target: aarch64-unknown-linux-gnu
             os: ubuntu-latest
             filename: git-branch-delete-merged-linux-arm64
+          - target: i686-pc-windows-msvc
+            os: windows-latest
+            filename: git-branch-delete-merged-win-32bit.exe
           - target: x86_64-pc-windows-msvc
             os: windows-latest
             filename: git-branch-delete-merged-win-x86_64.exe
