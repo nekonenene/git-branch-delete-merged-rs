@@ -80,6 +80,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
+          generate_release_notes: true
           files: |
             git-branch-delete-merged-linux-x86_64
             git-branch-delete-merged-linux-arm64
