@@ -1,0 +1,48 @@
+name: release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    strategy:
+      matrix:
+        targets:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            filename: git-branch-delete-merged-linux-amd64
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            filename: git-branch-delete-merged-linux-arm64
+    runs-on: ${{ matrix.targets.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
+            target: ${{ matrix.targets.target }}
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --locked
+      - name: Rename result
+        run: |
+          cp target/release/git-branch-delete-merged* ${{ matrix.targets.filename }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: git-branch-delete-merged-artifacts
+          path: ${{ matrix.targets.filename }}
