@@ -181,7 +181,7 @@ fn delete_branch_prompt(target_branch_name: &str, yes_flag: bool) -> Result<bool
                 loop_end_flag = true;
             }
             "l" | "log" => {
-                    let result = spawn_command("git", &["log", target_branch_name]);
+                    let result = spawn_command("git", &["log", target_branch_name, "-100"]); // Show only 100 logs to avoid broken pipe error
                 if result.is_err() {
                     return Err(result.unwrap_err());
                 }
