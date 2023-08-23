@@ -16,3 +16,4 @@ keywords = ["git"]
 ansi_term = "0.12.1"
 anyhow = "1.0.75"
 clap = { version = "4.3.23", features = ["derive"] }
+spinners = "4.1.0"

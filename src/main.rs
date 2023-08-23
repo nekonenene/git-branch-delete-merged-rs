@@ -4,6 +4,7 @@ mod command;
 use ansi_term::Colour::{Red, Yellow, Green};
 use anyhow::Result;
 use clap::Parser;
+use spinners::{Spinner, Spinners};
 use std::process::Command;
 
 use crate::branches::{pick_merged_branches, pick_squashed_branches, delete_branches_with_prompt};
@@ -37,6 +38,8 @@ fn main() -> Result<()> {
         std::process::exit(1);
     }
 
+    let mut sp = Spinner::new(Spinners::Dots2, "Searching merged branches...".into());
+
     let result = exec_command("git", &["for-each-ref", "refs/heads/", "--format", "%(refname:short)"]);
     if result.is_err() {
         eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
@@ -63,6 +66,8 @@ fn main() -> Result<()> {
 
     deletable_branch_names.sort();
     deletable_branch_names.dedup();
+
+    sp.stop_with_newline();
 
     if deletable_branch_names.len() == 0 {
         println!("{}", Yellow.paint(format!("There is no branch which has merged into {}", base_branch_name)));
