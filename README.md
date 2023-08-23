@@ -1,4 +1,4 @@
-# git-branch-delete-merged Rust Edition
+# git-branch-delete-merged [Rust Edition]
 
 This CLI app deletes local branches that have been merged **also "[Squash and merge](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits)"**.
 
