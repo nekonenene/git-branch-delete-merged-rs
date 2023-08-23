@@ -7,7 +7,20 @@ It is based on https://github.com/nekonenene/git-branch-delete-merged written in
 
 ## Installation
 
-### Using cargo
+### Using binary:
+
+macOS or Linux can do the following.
+
+```sh
+# Install / Update
+curl -fL https://github.com/nekonenene/git-branch-delete-merged-rs/releases/latest/download/git-branch-delete-merged-$(uname -s)-$(uname -m) -o git-branch-delete-merged && chmod +x git-branch-delete-merged
+mv git-branch-delete-merged /usr/local/bin
+
+# Uninstall
+rm /usr/local/bin/git-branch-delete-merged
+```
+
+### Using cargo:
 
 After [installing cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html),
 
@@ -20,19 +33,6 @@ cargo install --force --git https://github.com/nekonenene/git-branch-delete-merg
 
 # Uninstall
 cargo uninstall git-branch-delete-merged
-```
-
-### Using binary
-
-macOS or Linux can do the following.
-
-```sh
-# Install / Update
-curl -fL https://github.com/nekonenene/git-branch-delete-merged-rs/releases/latest/download/git-branch-delete-merged-$(uname -s)-$(uname -m) -o git-branch-delete-merged && chmod +x git-branch-delete-merged
-mv git-branch-delete-merged /usr/local/bin
-
-# Uninstall
-rm /usr/local/bin/git-branch-delete-merged
 ```
 
 
