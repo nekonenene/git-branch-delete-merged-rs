@@ -15,7 +15,7 @@ use crate::command::exec_command;
 struct Args {
     #[arg(required = true, index = 1, help = "Base branch name (e.g. main, develop)")]
     base_branch: String,
-    #[arg(required = false, long = "yes", short = 'y', action = clap::ArgAction::SetTrue, help = "Delete all merged branches without confirmation")]
+    #[arg(required = false, long = "yes", short = 'y', action = clap::ArgAction::SetTrue, help = "Delete all merged branches without confirmations")]
     yes_flag: bool,
 }
 
