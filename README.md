@@ -53,7 +53,7 @@ cargo uninstall git-branch-delete-merged
 
 ## Usage
 
-### General usage
+### General usage:
 
 If you want to delete a branch that has merged into the `main` branch:
 
@@ -64,7 +64,7 @@ git-branch-delete-merged main
 And if the branch to delete exists, you will get a prompt like this:
 
 ```
-Target branches: [dev1]
+Found 2 merged branches: [dev1 dev2]
 
 Are you sure to delete 'dev1' branch? [y|n|l|d|q|help]:
 ```
@@ -78,9 +78,9 @@ Please type one and press enter.
 * `q`: Quit immediately
 * `h`: Show help
 
-### Skip prompt
+### Skip prompt:
 
-If you want to delete all merged branches without confirmation, `--yes` option will be useful.
+If you want to delete all merged branches without confirmations, `--yes` option will be useful.
 
 ```sh
 git-branch-delete-merged main --yes
