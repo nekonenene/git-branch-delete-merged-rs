@@ -7,6 +7,21 @@ It is based on https://github.com/nekonenene/git-branch-delete-merged written in
 
 ## Installation
 
+### Using Homebrew:
+
+macOS or Linux can install through [Homebrew](https://brew.sh).
+
+```sh
+# Install
+brew install nekonenene/tap/git-branch-delete-merged
+
+# Update
+brew update && brew upgrade git-branch-delete-merged
+
+# Uninstall
+brew remove git-branch-delete-merged
+```
+
 ### Using binary:
 
 macOS or Linux can do the following.
