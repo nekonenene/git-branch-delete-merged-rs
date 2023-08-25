@@ -38,10 +38,11 @@ fn main() -> Result<()> {
         std::process::exit(1);
     }
 
-    let mut sp = Spinner::new(Spinners::Dots2, "Searching merged branches...".into());
+    let mut spinner = Spinner::new(Spinners::Dots2, "Searching merged branches...".into());
 
     let result = pick_merged_branches(base_branch_name);
     if let Err(err) = result {
+        spinner.stop_with_newline();
         eprintln!("{}", Red.paint(err.to_string()));
         std::process::exit(1);
     }
@@ -51,6 +52,7 @@ fn main() -> Result<()> {
 
     let result = pick_squashed_branches(base_branch_name);
     if let Err(err) = result {
+        spinner.stop_with_newline();
         eprintln!("{}", Red.paint(err.to_string()));
         std::process::exit(1);
     }
@@ -61,7 +63,7 @@ fn main() -> Result<()> {
     deletable_branch_names.sort();
     deletable_branch_names.dedup();
 
-    sp.stop_with_newline();
+    spinner.stop_with_newline();
 
     if deletable_branch_names.len() == 0 {
         println!("{}", Yellow.paint(format!("There is no branch which has merged into {}", base_branch_name)));
