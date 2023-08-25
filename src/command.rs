@@ -37,18 +37,8 @@ pub fn exec_command(program: &str, args: &[&str]) -> Result<String> {
 pub fn spawn_command(program: &str, args: &[&str]) -> Result<()> {
     let args_str = args.join(" ");
 
-    let result = Command::new(program).args(args).spawn();
-    if result.is_err() {
-        return Err(anyhow!(result.unwrap_err()));
-    }
-
-    let mut child = result.unwrap();
-    let result = child.wait();
-    if result.is_err() {
-        return Err(anyhow!(result.unwrap_err()));
-    }
-
-    let exit_status = result.unwrap();
+    let mut child = Command::new(program).args(args).spawn()?;
+    let exit_status = child.wait()?;
     if !exit_status.success() {
         println!("{}", Yellow.paint(format!("[WARN] \"{} {}\" received {}", program, args_str, exit_status)));
     }
