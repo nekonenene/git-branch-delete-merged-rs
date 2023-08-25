@@ -40,12 +40,6 @@ fn main() -> Result<()> {
 
     let mut sp = Spinner::new(Spinners::Dots2, "Searching merged branches...".into());
 
-    let result = exec_command("git", &["for-each-ref", "refs/heads/", "--format", "%(refname:short)"]);
-    if let Err(err) = result {
-        eprintln!("{}", Red.paint(err.to_string()));
-        std::process::exit(1);
-    }
-
     let result = pick_merged_branches(base_branch_name);
     if let Err(err) = result {
         eprintln!("{}", Red.paint(err.to_string()));
