@@ -27,13 +27,13 @@ fn main() -> Result<()> {
     let mut deletable_branch_names = Vec::new();
 
     let result = Command::new("git").arg("version").output();
-    if result.is_err() {
+    if let Err(_) = result {
         eprintln!("{}", Red.paint("Command not found: git"));
         std::process::exit(1);
     }
 
     let result = exec_command("git", &["rev-parse", "--verify", base_branch_name]);
-    if result.is_err() {
+    if let Err(_) = result {
         eprintln!("{}", Red.paint(format!("Base branch not found: {}", base_branch_name)));
         std::process::exit(1);
     }
@@ -41,14 +41,14 @@ fn main() -> Result<()> {
     let mut sp = Spinner::new(Spinners::Dots2, "Searching merged branches...".into());
 
     let result = exec_command("git", &["for-each-ref", "refs/heads/", "--format", "%(refname:short)"]);
-    if result.is_err() {
-        eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
+    if let Err(err) = result {
+        eprintln!("{}", Red.paint(err.to_string()));
         std::process::exit(1);
     }
 
     let result = pick_merged_branches(base_branch_name);
-    if result.is_err() {
-        eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
+    if let Err(err) = result {
+        eprintln!("{}", Red.paint(err.to_string()));
         std::process::exit(1);
     }
 
@@ -56,8 +56,8 @@ fn main() -> Result<()> {
     deletable_branch_names.append(&mut merged_branch_names);
 
     let result = pick_squashed_branches(base_branch_name);
-    if result.is_err() {
-        eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
+    if let Err(err) = result {
+        eprintln!("{}", Red.paint(err.to_string()));
         std::process::exit(1);
     }
 
@@ -77,8 +77,8 @@ fn main() -> Result<()> {
     }
 
     let result = delete_branches_with_prompt(base_branch_name, &deletable_branch_names, yes_flag);
-    if result.is_err() {
-        eprintln!("{}", Red.paint(&result.unwrap_err().to_string()));
+    if let Err(err) = result {
+        eprintln!("{}", Red.paint(err.to_string()));
         std::process::exit(1);
     }
 
