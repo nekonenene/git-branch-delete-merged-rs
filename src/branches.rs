@@ -1,5 +1,5 @@
 use ansi_term::Colour::{Yellow, Green};
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use std::io::Write;
 
 use crate::command::{exec_command, spawn_command};
@@ -9,12 +9,8 @@ use crate::command::{exec_command, spawn_command};
 /// # Arguments
 /// * `base_branch_name` - Base branch (e.g. main, develop)
 pub fn pick_merged_branches(base_branch_name: &str) -> Result<Vec<String>> {
-    let result = exec_command("git", &["branch", "--merged", base_branch_name, "--format", "%(refname:short)"]);
-    if result.is_err() {
-        return Err(result.unwrap_err());
-    }
-
-    let merged_branch_names_with_newline = result.unwrap();
+    let merged_branch_names_with_newline =
+        exec_command("git", &["branch", "--merged", base_branch_name, "--format", "%(refname:short)"])?;
     let mut merged_branch_names: Vec<String> = merged_branch_names_with_newline.split('\n').map(str::to_string).collect();
     merged_branch_names.retain(|branch_name| branch_name != base_branch_name);
 
@@ -28,12 +24,8 @@ pub fn pick_merged_branches(base_branch_name: &str) -> Result<Vec<String>> {
 pub fn pick_squashed_branches(base_branch_name: &str) -> Result<Vec<String>> {
     let mut squashed_branch_names = Vec::new();
 
-    let result = exec_command("git", &["for-each-ref", "refs/heads/", "--format", "%(refname:short)"]);
-    if result.is_err() {
-        return Err(result.unwrap_err());
-    }
-
-    let local_branch_names_with_newline = result.unwrap();
+    let local_branch_names_with_newline =
+        exec_command("git", &["for-each-ref", "refs/heads/", "--format", "%(refname:short)"])?;
     let local_branch_names: Vec<&str> = local_branch_names_with_newline.split('\n').collect();
 
     // Add squashed branche names into squashed_branch_names
@@ -42,12 +34,8 @@ pub fn pick_squashed_branches(base_branch_name: &str) -> Result<Vec<String>> {
             continue;
         }
 
-        let result = is_squashed_branch(base_branch_name, local_branch_name);
-        if result.is_err() {
-            return Err(result.unwrap_err());
-        }
+        let is_squashed = is_squashed_branch(base_branch_name, local_branch_name)?;
 
-        let is_squashed = result.unwrap();
         if is_squashed {
             squashed_branch_names.push(local_branch_name.to_string());
         }
@@ -62,33 +50,14 @@ pub fn pick_squashed_branches(base_branch_name: &str) -> Result<Vec<String>> {
 /// * `base_branch_name` - Base branch (e.g. main, develop)
 /// * `target_branch_name` - Branch to be checked
 fn is_squashed_branch(base_branch_name: &str, target_branch_name: &str) -> Result<bool> {
-    let result = exec_command("git", &["merge-base", base_branch_name, target_branch_name]);
-    if result.is_err() {
-        return Err(result.unwrap_err());
-    }
-
-    let ancestor_commit_obj_hash = result.unwrap();
-
-    let result = exec_command("git", &["rev-parse", &format!("{}^{{tree}}", target_branch_name)]);
-    if result.is_err() {
-        return Err(result.unwrap_err());
-    }
-
-    let root_tree_obj_hash = result.unwrap();
-
-    let result = exec_command("git", &["commit-tree", &root_tree_obj_hash, "-p", &ancestor_commit_obj_hash, "-m", "Temporary commit"]);
-    if result.is_err() {
-        return Err(result.unwrap_err());
-    }
-
-    let tmp_commit_obj_hash = result.unwrap();
-
-    let result = exec_command("git", &["cherry", base_branch_name, &tmp_commit_obj_hash]);
-    if result.is_err() {
-        return Err(result.unwrap_err());
-    }
-
-    let cherry_result = result.unwrap();
+    let ancestor_commit_obj_hash =
+        exec_command("git", &["merge-base", base_branch_name, target_branch_name])?;
+    let root_tree_obj_hash =
+        exec_command("git", &["rev-parse", &format!("{}^{{tree}}", target_branch_name)])?;
+    let tmp_commit_obj_hash =
+        exec_command("git", &["commit-tree", &root_tree_obj_hash, "-p", &ancestor_commit_obj_hash, "-m", "Temporary commit"])?;
+    let cherry_result =
+        exec_command("git", &["cherry", base_branch_name, &tmp_commit_obj_hash])?;
 
     if cherry_result.starts_with("- ") {
         Ok(true)
@@ -104,12 +73,7 @@ fn is_squashed_branch(base_branch_name: &str, target_branch_name: &str) -> Resul
 /// * `deletable_branch_names` - List of branches to be deleted
 /// * `yes_flag` - If true, delete all branches without confirmation
 pub fn delete_branches_with_prompt(base_branch_name: &str, deletable_branch_names: &Vec<String>, yes_flag: bool) -> Result<()> {
-    let result = exec_command("git", &["rev-parse", "--abbrev-ref", "HEAD"]);
-    if result.is_err() {
-        return Err(result.unwrap_err());
-    }
-
-    let current_branch_name = result.unwrap();
+    let current_branch_name = exec_command("git", &["rev-parse", "--abbrev-ref", "HEAD"])?;
 
     for target_branch_name in deletable_branch_names.into_iter() {
         let target_branch_name = target_branch_name.to_string();
@@ -122,10 +86,7 @@ pub fn delete_branches_with_prompt(base_branch_name: &str, deletable_branch_name
             continue;
         }
 
-        let result = delete_branch_prompt(&target_branch_name, yes_flag);
-        if result.is_err() {
-            return Err(result.unwrap_err());
-        }
+        delete_branch_prompt(&target_branch_name, yes_flag)?;
     }
 
     Ok(())
@@ -149,27 +110,15 @@ fn delete_branch_prompt(target_branch_name: &str, yes_flag: bool) -> Result<bool
 
                 let mut user_input = String::new();
                 let stdin = std::io::stdin();
-                let result = stdin.read_line(&mut user_input);
-                if result.is_err() {
-                    return Err(anyhow!(result.unwrap_err()));
-                }
+                stdin.read_line(&mut user_input)?;
 
                 user_input.trim_end_matches('\n').to_string()
             };
 
         match input.as_str() {
             "y" | "yes" => {
-                let result = exec_command("git", &["rev-parse", target_branch_name]);
-                if result.is_err() {
-                    return Err(result.unwrap_err());
-                }
-
-                let latest_commit_id = result.unwrap();
-
-                let result = exec_command("git", &["branch", "-D", target_branch_name]);
-                if result.is_err() {
-                    return Err(result.unwrap_err());
-                }
+                let latest_commit_id = exec_command("git", &["rev-parse", target_branch_name])?;
+                exec_command("git", &["branch", "-D", target_branch_name])?;
 
                 println!("{}", Green.paint(format!("Deleted '{}' branch", target_branch_name)));
                 println!("You can recreate this branch with `git branch {} {}`", target_branch_name, latest_commit_id);
@@ -181,16 +130,10 @@ fn delete_branch_prompt(target_branch_name: &str, yes_flag: bool) -> Result<bool
                 loop_end_flag = true;
             }
             "l" | "log" => {
-                    let result = spawn_command("git", &["log", target_branch_name, "-100"]); // Show only 100 logs to avoid broken pipe error
-                if result.is_err() {
-                    return Err(result.unwrap_err());
-                }
+                spawn_command("git", &["log", target_branch_name, "-100"])?; // Show only 100 logs to avoid broken pipe error
             }
             "d" | "diff" => {
-                let result = spawn_command("git", &["show", target_branch_name, "-v"]);
-                if result.is_err() {
-                    return Err(result.unwrap_err());
-                }
+                spawn_command("git", &["show", target_branch_name, "-v"])?;
             }
             "q" | "quit" => {
                 println!("{}", Yellow.paint("Suspends processing"));
