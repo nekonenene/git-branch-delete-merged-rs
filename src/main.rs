@@ -38,6 +38,7 @@ fn main() -> Result<()> {
         std::process::exit(1);
     }
 
+    // Start searching and showing the spinner
     let mut spinner = Spinner::new(Spinners::Dots2, "Searching merged branches...".into());
 
     let result = pick_merged_branches(base_branch_name);
@@ -63,6 +64,7 @@ fn main() -> Result<()> {
     deletable_branch_names.sort();
     deletable_branch_names.dedup();
 
+    // End searching, and stop showing the spinner
     spinner.stop_with_newline();
 
     if deletable_branch_names.len() == 0 {
